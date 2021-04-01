@@ -141,6 +141,6 @@ private:
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AkoFlanger);
 };
 
-Plugin *createPLugin() { return new AkoFlanger(); }
+Plugin *createPlugin() { return new AkoFlanger(); }
 
 END_NAMESPACE_DISTRHO
