@@ -86,7 +86,29 @@ protected:
     }
   }
 
-  void run(const float **, float **outputs, uint32_t frames) override;
+  void run(const float **inputs, float **outputs, uint32_t frames) override {
+    const float *const inL = inputs[0];
+    const float *const inR = inputs[1];
+    float *const outL = outputs[0];
+    float *const outR = outputs[1];
+    for (uint32_t i = 0; i < frames; ++i) {
+      float n = lfo.get_value();
+      outL[i] = inL[i] + depth * (vL + ff_bufferL.get_value(p3 + 1)) -
+                regen * fd_bufferL.get_value(p3);
+      outR[i] = inR[i] + depth * (vR + ff_bufferR.get_value(p3 + 1)) -
+                regen * fd_bufferR.get_value(p3);
+      vR = n * (ff_bufferR.get_value(p3) - vR);
+      vL = n * (ff_bufferL.get_value(p3) - vL);
+      ff_bufferL.set_value(p3, inL[i]);
+      ff_bufferR.set_value(p3, inR[i]);
+      fd_bufferL.set_value(p3, outL[i]);
+      fd_bufferR.set_value(p3, outR[i]);
+      p3++;
+      if (p3 >= delay3) {
+        p3 = 0;
+      }
+    }
+  }
 
 private:
   RingBuffer ff_buffer; // feedforward buffer
