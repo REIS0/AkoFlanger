@@ -3,6 +3,7 @@
 # ---------------------------- #
 # Created by falkTX
 #
+# Modified by REIS0
 
 VST2 ?= true
 LV2 ?= true
