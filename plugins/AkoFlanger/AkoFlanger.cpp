@@ -68,10 +68,6 @@ protected:
   }
 
   void setParameterValue(uint32_t index, float value) override {
-    if (index >= paramParameterCount) {
-      return;
-    }
-
     switch (index) {
     case paramDepth:
       depth = value;
@@ -81,6 +77,8 @@ protected:
       break;
     case paramRegenAmount:
       regen = value;
+      break;
+    default:
       break;
     }
   }
