@@ -10,8 +10,9 @@
 class AkoFlanger : public Plugin {
 public:
   AkoFlanger()
-      : Plugin(paramParameterCount, 0, 0), ff_buffer(BUFFER_SIZE),
-        fd_buffer(BUFFER_SIZE), delay1(BUFFER_SIZE * 0.6),
+      : Plugin(paramParameterCount, 0, 0), ff_bufferR(BUFFER_SIZE),
+        ff_bufferL(BUFFER_SIZE), fd_bufferR(BUFFER_SIZE),
+        fd_bufferL(BUFFER_SIZE), delay1(BUFFER_SIZE * 0.6),
         delay2(BUFFER_SIZE * 0.8), delay3(BUFFER_SIZE),
         p1(delay1 - BUFFER_SIZE), p2(delay2 - BUFFER_SIZE), p3(delay3),
         lfo(5.0, SAMPLERATE) {}
@@ -111,8 +112,10 @@ protected:
   }
 
 private:
-  RingBuffer ff_buffer; // feedforward buffer
-  RingBuffer fd_buffer; // feedback buffer
+  RingBuffer ff_bufferR; // feedforward buffer
+  RingBuffer ff_bufferL;
+  RingBuffer fd_bufferR; // feedback buffer
+  RingBuffer fd_bufferL;
 
   int delay1;
   int delay2;
@@ -122,6 +125,10 @@ private:
   int p1;
   int p2;
   int p3;
+
+  // y(n - 1) from allpass interpolation
+  float vL = 0;
+  float vR = 0;
 
   // PARAMS
 
