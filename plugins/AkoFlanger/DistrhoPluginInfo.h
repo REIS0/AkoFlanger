@@ -20,20 +20,18 @@
 #define DISTRHO_PLUGIN_NAME  "AkoFlanger"
 #define DISTRHO_PLUGIN_URI   "https://github.com/REIS0/AkoFlanger"
 
-// ! Checar os parametros
 #define DISTRHO_PLUGIN_IS_RT_SAFE    1
 #define DISTRHO_PLUGIN_NUM_INPUTS    2
 #define DISTRHO_PLUGIN_NUM_OUTPUTS   2
-// #define DISTRHO_PLUGIN_WANT_PROGRAMS 1
-// #define DISTRHO_UI_USER_RESIZABLE    1
 
 enum Parameters {
-    kDepth,
-    kLFOSpeed,
-    kRegenAmount,
-    kWaveType,
+    paramDepth,
+    paramLFOSpeed,
+    paramRegenAmount,
+    // TODO: wave type
+    // paramWaveType,
     // kInvert,
-    kParameterCount
+    paramParameterCount
 };
 
 #endif // DISTRHO_PLUGIN_INFO_H_INCLUDED
