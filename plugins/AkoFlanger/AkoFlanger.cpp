@@ -1,4 +1,3 @@
-
 #include "DistrhoPlugin.hpp"
 #include "DistrhoPluginInfo.h"
 #include "DistrhoUtils.hpp"
