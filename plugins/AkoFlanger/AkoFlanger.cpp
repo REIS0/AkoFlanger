@@ -3,9 +3,12 @@
 #include "DistrhoUtils.hpp"
 #include "LFO.hpp"
 #include "RingBuffer.hpp"
+#include "src/DistrhoDefines.h"
 #define BUFFER_SIZE 2048
 // ? set samplerate from the host ?
 #define SAMPLERATE 48000
+
+START_NAMESPACE_DISTRHO
 
 class AkoFlanger : public Plugin {
 public:
@@ -135,4 +138,10 @@ private:
 
   // TODO: invert depth operation
   // bool invert;
+
+  DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AkoFlanger);
 };
+
+Plugin *createPLugin() { return new AkoFlanger(); }
+
+END_NAMESPACE_DISTRHO
