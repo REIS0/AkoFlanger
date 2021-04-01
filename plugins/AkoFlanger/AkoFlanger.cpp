@@ -28,10 +28,6 @@ protected:
   int64_t getUniqueId() const override { return d_cconst('A', 'k', 'o', 'F'); }
 
   void initParameter(uint32_t index, Parameter &parameter) override {
-    if (index >= paramParameterCount) {
-      return;
-    }
-
     switch (index) {
     case paramDepth:
       parameter.name = "Depth";
@@ -53,6 +49,8 @@ protected:
       parameter.ranges.def = 0.5;
       parameter.ranges.min = 0.0;
       parameter.ranges.max = 1.0;
+    default:
+      return;
     }
   };
 
