@@ -12,16 +12,16 @@ float RingBuffer::get_value(int index) {
 }
 
 void RingBuffer::set_value(int index, float value) {
-    this->buffer[rotate_index(index)] = value;
+  buffer[rotate_index(index)] = value;
 }
 
 /* ----- PRIVATE ----- */
 
 int RingBuffer::rotate_index(int index) {
-  if (index >= this->buffer_size)
-    return index - this->buffer_size;
+  if (index >= buffer_size)
+    return index - buffer_size;
   else if (index < 0)
-    return this->buffer_size + index;
+    return buffer_size + index;
   else
     return index;
 }
