@@ -17,7 +17,7 @@ public:
         fd_bufferL(BUFFER_SIZE), delay1(BUFFER_SIZE * 0.6),
         delay2(BUFFER_SIZE * 0.8), delay3(BUFFER_SIZE),
         p1(delay1 - BUFFER_SIZE), p2(delay2 - BUFFER_SIZE), p3(delay3),
-        lfo(5.0, SAMPLERATE) {}
+        depth(0.5), regen(0.5), lfo(5.0, SAMPLERATE) {}
 
 protected:
   const char *getLabel() const override { return "AkoFlanger"; }
@@ -92,12 +92,10 @@ protected:
     float *const outR = outputs[1];
     for (uint32_t i = 0; i < frames; ++i) {
       float n = lfo.get_value();
-      outL[i] = inL[i] + depth * (vL + ff_bufferL.get_value(p3 + 1)) -
-                regen * fd_bufferL.get_value(p3);
-      outR[i] = inR[i] + depth * (vR + ff_bufferR.get_value(p3 + 1)) -
-                regen * fd_bufferR.get_value(p3);
-      vR = n * (ff_bufferR.get_value(p3) - vR);
-      vL = n * (ff_bufferL.get_value(p3) - vL);
+      vL = n * (ff_bufferL.get_value(p3) - vL) + ff_bufferL.get_value(p3 - 1);
+      vR = n * (ff_bufferR.get_value(p3) - vR) + ff_bufferR.get_value(p3 - 1);
+      outL[i] = inL[i] + depth * vL - regen * fd_bufferL.get_value(p3);
+      outR[i] = inR[i] + depth * vR - regen * fd_bufferL.get_value(p3);
       ff_bufferL.set_value(p3, inL[i]);
       ff_bufferR.set_value(p3, inR[i]);
       fd_bufferL.set_value(p3, outL[i]);
