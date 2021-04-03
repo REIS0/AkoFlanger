@@ -8,7 +8,7 @@ RingBuffer::RingBuffer(int buffer_size) {
 }
 
 float RingBuffer::get_value(int index) {
-    return rotate_index(index);
+  return buffer.at(rotate_index(index));
 }
 
 void RingBuffer::set_value(int index, float value) {
