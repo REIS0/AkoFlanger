@@ -3,7 +3,6 @@
 #include "DistrhoUtils.hpp"
 #include "LFO.hpp"
 #include "RingBuffer.hpp"
-#define BUFFER_SIZE 2048
 // ? set samplerate from the host ?
 #define SAMPLERATE 96000
 // #define BUFFER_SIZE SAMPLERATE * 0.025
