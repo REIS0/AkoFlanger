@@ -12,12 +12,10 @@ START_NAMESPACE_DISTRHO
 class AkoFlanger : public Plugin {
 public:
   AkoFlanger()
-      : Plugin(paramParameterCount, 0, 0), ff_bufferR(BUFFER_SIZE),
-        ff_bufferL(BUFFER_SIZE), fd_bufferR(BUFFER_SIZE),
-        fd_bufferL(BUFFER_SIZE), delay1(BUFFER_SIZE * 0.6),
-        delay2(BUFFER_SIZE * 0.8), delay3(BUFFER_SIZE),
-        p1(delay1 - BUFFER_SIZE), p2(delay2 - BUFFER_SIZE), p3(delay3),
-        depth(0.5), regen(0.5), lfo(5.0, SAMPLERATE) {}
+      : Plugin(paramParameterCount, 0, 0), delay((int) SAMPLERATE * 0.025),
+        ff_bufferR(delay), ff_bufferL(delay), fd_bufferR(delay),
+        fd_bufferL(delay), p1(delay * 0.6 - delay), p2(delay * 0.8 - delay),
+        p3(0), depth(0.5), regen(0.5), out_gain(0.8), lfo(5.0, SAMPLERATE) {}
 
 protected:
   const char *getLabel() const override { return "AkoFlanger"; }
@@ -122,14 +120,12 @@ protected:
   }
 
 private:
+  int delay; // max delay
+
   RingBuffer ff_bufferR; // feedforward buffer
   RingBuffer ff_bufferL;
   RingBuffer fd_bufferR; // feedback buffer
   RingBuffer fd_bufferL;
-
-  int delay1;
-  int delay2;
-  int delay3; // the max delay value
 
   // the pivots for each delay line
   int p1;
