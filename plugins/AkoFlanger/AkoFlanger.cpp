@@ -5,7 +5,8 @@
 #include "RingBuffer.hpp"
 #define BUFFER_SIZE 2048
 // ? set samplerate from the host ?
-#define SAMPLERATE 48000
+#define SAMPLERATE 96000
+// #define BUFFER_SIZE SAMPLERATE * 0.025
 
 START_NAMESPACE_DISTRHO
 
