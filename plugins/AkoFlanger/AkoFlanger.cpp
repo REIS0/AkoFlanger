@@ -145,9 +145,7 @@ private:
   RingBuffer fd_bufferL;
 
   // the pivots for each delay line
-  int p1;
-  int p2;
-  int p3;
+  int p1, p2, p3;
 
   // y(n - 1) from allpass interpolation
   float v1L = 0;
