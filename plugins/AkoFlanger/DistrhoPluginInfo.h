@@ -28,6 +28,7 @@ enum Parameters {
     paramDepth,
     paramLFOSpeed,
     paramRegenAmount,
+    paramOutGain,
     // TODO: wave type
     // paramWaveType,
     // kInvert,

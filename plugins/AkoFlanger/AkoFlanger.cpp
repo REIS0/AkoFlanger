@@ -51,6 +51,15 @@ protected:
       parameter.ranges.def = 0.5;
       parameter.ranges.min = 0.0;
       parameter.ranges.max = 1.0;
+      break;
+    case paramOutGain:
+      parameter.name = "Output Gain";
+      parameter.symbol = "out_gain";
+      parameter.ranges.def = 0.8;
+      parameter.ranges.min = 0.1;
+      parameter.ranges.max = 1.0;
+      parameter.hints = kParameterIsOutput;
+      break;
     default:
       return;
     }
@@ -64,6 +73,8 @@ protected:
       return lfo.get_freq();
     case paramRegenAmount:
       return regen;
+    case paramOutGain:
+      return out_gain;
     default:
       return 0.0;
     }
@@ -79,6 +90,9 @@ protected:
       break;
     case paramRegenAmount:
       regen = value;
+      break;
+    case paramOutGain:
+      out_gain = value;
       break;
     default:
       break;
@@ -130,6 +144,8 @@ private:
 
   float depth;
   float regen;
+
+  float out_gain;
 
   LFO lfo;
 
