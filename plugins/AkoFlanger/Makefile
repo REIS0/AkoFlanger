@@ -16,7 +16,7 @@ NAME = AkoFlanger
 # --------------------------------------------------------------
 # Files to build
 
-FILES_DSP = AkoFlanger.cpp RingBuffer.cpp LFO.cpp
+FILES_DSP = AkoFlanger.cpp RingBuffer.cpp LFO.cpp Flanger.cpp
 
 # --------------------------------------------------------------
 # Do some magic
