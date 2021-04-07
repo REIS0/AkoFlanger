@@ -4,7 +4,7 @@
 
 LFO::LFO(float freq, int samplerate) {
   this->freq = freq;
-  this->t_samples = 1 / samplerate;
+  this->t_samples = 1.0 / samplerate;
   this->time = 0;
   // TODO: add a triangle wave option
   this->wave_type = 0;
