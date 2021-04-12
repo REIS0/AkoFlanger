@@ -1,5 +1,4 @@
 #include "RingBuffer.hpp"
-// TODO
 
 class Flanger {
 public:
