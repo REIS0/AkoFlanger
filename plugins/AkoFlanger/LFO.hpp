@@ -4,7 +4,7 @@ public:
 
   float get_value();
 
-  void set_freq(int freq);
+  void set_freq(float freq);
   float get_freq() const;
 
 private:

@@ -19,6 +19,6 @@ float LFO::get_value() {
   return y;
 }
 
-void LFO::set_freq(int freq) { this->freq = freq; }
+void LFO::set_freq(float freq) { this->freq = freq; }
 
 float LFO::get_freq() const { return freq; }
