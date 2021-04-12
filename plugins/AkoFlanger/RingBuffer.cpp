@@ -4,7 +4,7 @@
 
 RingBuffer::RingBuffer(int buffer_size) {
   this->buffer_size = buffer_size;
-  this->buffer.assign(buffer_size, 0);
+  this->buffer.assign(buffer_size, 0.0);
 }
 
 float RingBuffer::get_value(int index) {
