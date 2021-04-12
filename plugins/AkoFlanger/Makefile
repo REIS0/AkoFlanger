@@ -26,9 +26,9 @@ include ../../dpf/Makefile.plugins.mk
 # --------------------------------------------------------------
 # VST2 and LV2 targets
 
-ifeq ($(VST2), true)
-TARGETS += vst
-endif
+# ifeq ($(VST2), true)
+# TARGETS += vst
+# endif
 
 ifeq ($(LV2), true)
 ifeq ($(HAVE_DGL),true)
