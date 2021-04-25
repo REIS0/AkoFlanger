@@ -4,17 +4,16 @@
 
 LFO::LFO(float freq, int samplerate) {
   this->freq = freq;
-  this->t_samples = 1.0 / samplerate;
-  this->time = 0;
+  this->t_samples = 1.f / samplerate;
+  this->time = 0.f;
   // TODO: add a triangle wave option
-  this->wave_type = 0;
+  // this->wave_type = 0;
 }
 
 float LFO::get_value() {
-  float y;
   // TODO: triangle wave
   // y(t) = A*sin(2pi*f*t + p)
-  y = (std::sin(2 * TWO_PI * freq * time) * 0.5) + 0.5;
+  float y = (std::sin(2.f * TWO_PI * freq * time) * 0.5f) + 0.5f;
   time += t_samples;
   return y;
 }
