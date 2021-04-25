@@ -1,21 +1,20 @@
 #include "DistrhoPlugin.hpp"
 #include "DistrhoPluginInfo.h"
 #include "DistrhoUtils.hpp"
+#include "Flanger.hpp"
 #include "LFO.hpp"
-#include "RingBuffer.hpp"
-// ? set samplerate from the host ?
-#define SAMPLERATE 96000
-// #define BUFFER_SIZE SAMPLERATE * 0.025
+#include <array>
+#define MAX_DELAY this->getSampleRate() * 0.05
+#define DELAY this->getSampleRate() * 0.02
 
 START_NAMESPACE_DISTRHO
 
 class AkoFlanger : public Plugin {
 public:
   AkoFlanger()
-      : Plugin(paramParameterCount, 0, 0), delay((int) SAMPLERATE * 0.025),
-        ff_bufferR(delay), ff_bufferL(delay), fd_bufferR(delay),
-        fd_bufferL(delay), p1(delay * 0.6 - delay), p2(delay * 0.8 - delay),
-        p3(0), depth(0.5), regen(0.5), out_gain(0.8), lfo(5.0, SAMPLERATE) {}
+      : Plugin(paramParameterCount, 0, 0), flangerL(DELAY, MAX_DELAY),
+        flangerR(DELAY, MAX_DELAY), depth(0.5f), regen(0.5f), dry_wet(0.5f),
+        lfo(1.f, this->getSampleRate()) {}
 
 protected:
   const char *getLabel() const override { return "AkoFlanger"; }
@@ -103,58 +102,23 @@ protected:
     float *const outR = outputs[1];
     for (uint32_t i = 0; i < frames; ++i) {
       float n = lfo.get_value();
-      v1L = n * (ff_bufferL.get_value(p1) - v1L) + ff_bufferL.get_value(p1 - 1);
-      v1R = n * (ff_bufferR.get_value(p1) - v1R) + ff_bufferR.get_value(p1 - 1);
-      v2L = n * (ff_bufferL.get_value(p2) - v2L) + ff_bufferL.get_value(p2 - 1);
-      v2R = n * (ff_bufferR.get_value(p2) - v2R) + ff_bufferR.get_value(p2 - 1);
-      v3L = n * (ff_bufferL.get_value(p3) - v3L) + ff_bufferL.get_value(p3 - 1);
-      v3R = n * (ff_bufferR.get_value(p3) - v3L) + ff_bufferR.get_value(p3 - 1);
+      outL[i] =
+          (1 - dry_wet) * inL[i] + dry_wet * flangerL.process(n, depth, inL[i]);
+      outR[i] =
+          (1 - dry_wet) * inR[i] + dry_wet * flangerR.process(n, depth, inR[i]);
       // TODO: feedback modulation
-      outL[i] = inL[i] + (depth * 0.3) * v1L + (depth * 0.4) * v2L +
-                (depth * 0.5) * v3L - regen * fd_bufferL.get_value(p3);
-      outR[i] = inR[i] + (depth * 0.3) * v1R + (depth * 0.4) * v2R +
-                (depth * 0.5) * v3R - regen * fd_bufferL.get_value(p3);
-      ff_bufferL.set_value(p3, inL[i]);
-      ff_bufferR.set_value(p3, inR[i]);
-      fd_bufferL.set_value(p3, outL[i]);
-      fd_bufferR.set_value(p3, outR[i]);
-      outL[i] = outL[i] * out_gain;
-      outR[i] = outR[i] * out_gain;
-      p1++;
-      p2++;
-      p3++;
-      if (p1 >= delay) {
-        p1 = 0;
-      }
-      if (p2 >= delay) {
-        p2 = 0;
-      }
-      if (p3 >= delay) {
-        p3 = 0;
-      }
     }
   }
 
 private:
-  int delay; // max delay
+  // TODO: stack flangers
+  // TODO: test cubic interpolation
 
-  RingBuffer ff_bufferR; // feedforward buffer
-  RingBuffer ff_bufferL;
-  RingBuffer fd_bufferR; // feedback buffer
-  RingBuffer fd_bufferL;
+  Flanger flangerL;
+  Flanger flangerR;
 
-  // the pivots for each delay line
-  int p1;
-  int p2;
-  int p3;
-
-  // y(n - 1) from allpass interpolation
-  float v1L = 0;
-  float v1R = 0;
-  float v2L = 0;
-  float v2R = 0;
-  float v3L = 0;
-  float v3R = 0;
+  // std::array<Flanger, 3> flangersL;
+  // std::array<Flanger, 3> flangersR;
 
   // PARAMS
 
