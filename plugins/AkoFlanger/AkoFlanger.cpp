@@ -32,31 +32,30 @@ protected:
     case paramDepth:
       parameter.name = "Depth";
       parameter.symbol = "depth";
-      parameter.ranges.def = 0.5;
-      parameter.ranges.min = 0.0;
-      parameter.ranges.max = 1.0;
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 1.f;
       break;
     case paramLFOSpeed:
       parameter.name = "Speed";
       parameter.symbol = "speed";
-      parameter.ranges.def = 5.0;
-      parameter.ranges.min = 1.0;
-      parameter.ranges.max = 10.0;
+      parameter.ranges.def = 1.5f;
+      parameter.ranges.min = 0.5f;
+      parameter.ranges.max = 2.5f;
       break;
     case paramRegenAmount:
       parameter.name = "Regen";
       parameter.symbol = "regen";
-      parameter.ranges.def = 0.5;
-      parameter.ranges.min = 0.0;
-      parameter.ranges.max = 1.0;
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.0f;
+      parameter.ranges.max = 1.f;
       break;
-    case paramOutGain:
-      parameter.name = "Output Gain";
-      parameter.symbol = "out_gain";
-      parameter.ranges.def = 0.8;
-      parameter.ranges.min = 0.1;
-      parameter.ranges.max = 1.0;
-      parameter.hints = kParameterIsOutput;
+    case paramDryWet:
+      parameter.name = "Dry/Wet";
+      parameter.symbol = "dry_wet";
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.1f;
+      parameter.ranges.max = 1.f;
       break;
     default:
       return;
@@ -71,10 +70,10 @@ protected:
       return lfo.get_freq();
     case paramRegenAmount:
       return regen;
-    case paramOutGain:
-      return out_gain;
+    case paramDryWet:
+      return dry_wet;
     default:
-      return 0.0;
+      return 0.0f;
     }
   }
 
@@ -84,13 +83,13 @@ protected:
       depth = value;
       break;
     case paramLFOSpeed:
-      lfo.set_freq(value);
+      lfo.set_freq(value); // needs smoothing
       break;
     case paramRegenAmount:
       regen = value;
       break;
-    case paramOutGain:
-      out_gain = value;
+    case paramDryWet:
+      dry_wet = value;
       break;
     default:
       break;
@@ -162,7 +161,7 @@ private:
   float depth;
   float regen;
 
-  float out_gain;
+  float dry_wet;
 
   LFO lfo;
 
