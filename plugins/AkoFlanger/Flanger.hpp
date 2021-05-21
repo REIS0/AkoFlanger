@@ -13,10 +13,7 @@ private:
   int delay;
   int max_delay;
   int diff;
-  // ? vectors sem precisar de uma classe separada ?
   RingBuffer buffer; // feedforward buffer
-
-  // std::vector<float> vecbuffer;
 
   int p = 0;
 };

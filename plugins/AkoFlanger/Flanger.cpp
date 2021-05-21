@@ -3,23 +3,21 @@
 /* ----- PUBLIC ----- */
 
 Flanger::Flanger(int delay, int max_delay)
-    : delay(delay), max_delay(max_delay), diff(max_delay - delay), buffer(max_delay) {
-  // vecbuffer.assign(max_delay, 0.0f);
-}
+    : delay(delay), max_delay(max_delay), diff(max_delay - delay),
+      buffer(max_delay) {}
 
 // use external LFO
 float Flanger::process(float n, float depth, float x) {
-  float y = x + depth * cubic_interpolation(n, buffer.get_value(p),
-                                            buffer.get_value(p + diff *
-                                            0.33), buffer.get_value(p + diff
-                                            * 0.66), buffer.get_value(p +
-                                            diff));
-  buffer.set_value(p, x);
-  // float y = x + depth * cubic_interpolation(
-  //                           n, vecbuffer.front(), vecbuffer.at(diff * 0.33),
-  //                           vecbuffer.at(diff * 0.66), vecbuffer.at(diff));
-  // vecbuffer.erase(vecbuffer.begin());
-  // vecbuffer.push_back(x);
+  // float y = x + depth * cubic_interpolation(n, buffer.get_value(p),
+  //                                           buffer.get_value(p + diff *
+  //                                           0.33), buffer.get_value(p + diff
+  //                                           * 0.66), buffer.get_value(p +
+  //                                           diff));
+  float vnm = buffer.get_value(p + diff);
+  float v = buffer.get_value(p) - n * vnm;
+  float y = x + depth * (n * v + vnm);
+  buffer.set_value(p, v);
+  // ? maybe useless ?
   p++;
   if (p >= max_delay) {
     p = 0;

@@ -12,9 +12,10 @@ START_NAMESPACE_DISTRHO
 class AkoFlanger : public Plugin {
 public:
   AkoFlanger()
-      : Plugin(paramParameterCount, 0, 0), flangerL(DELAY, MAX_DELAY),
-        flangerR(DELAY, MAX_DELAY), depth(0.5f), regen(0.5f), dry_wet(0.5f),
-        lfo(1.f, this->getSampleRate()) {}
+      : Plugin(paramParameterCount, 0, 0), depth(0.5f), regen(0.5f),
+        dry_wet(0.5f), lfo(1.f, this->getSampleRate()),
+        flangerL(DELAY, MAX_DELAY), flangerR(DELAY, MAX_DELAY),
+        regenL(DELAY, MAX_DELAY), regenR(DELAY, MAX_DELAY) {}
 
 protected:
   const char *getLabel() const override { return "AkoFlanger"; }
@@ -82,7 +83,7 @@ protected:
       depth = value;
       break;
     case paramLFOSpeed:
-      lfo.set_freq(value); // needs smoothing
+      lfo.set_freq(value); // !! needs smoothing
       break;
     case paramRegenAmount:
       regen = value;
@@ -104,30 +105,29 @@ protected:
       float n = lfo.get_value();
       outL[i] =
           (1 - dry_wet) * inL[i] + dry_wet * flangerL.process(n, depth, inL[i]);
+      outL[i] =
+          (1 - dry_wet) * outL[i] + dry_wet * regenL.process(n, regen, outL[i]);
+
       outR[i] =
           (1 - dry_wet) * inR[i] + dry_wet * flangerR.process(n, depth, inR[i]);
-      // TODO: feedback modulation
+      outR[i] =
+          (1 - dry_wet) * outR[i] + dry_wet * regenR.process(n, regen, outR[i]);
     }
   }
 
 private:
-  // TODO: stack flangers
-  // TODO: test cubic interpolation
-
-  Flanger flangerL;
-  Flanger flangerR;
-
-  // std::array<Flanger, 3> flangersL;
-  // std::array<Flanger, 3> flangersR;
-
-  // PARAMS
-
   float depth;
   float regen;
 
   float dry_wet;
 
   LFO lfo;
+
+  Flanger flangerL;
+  Flanger flangerR;
+
+  Flanger regenL;
+  Flanger regenR;
 
   // TODO: invert depth operation
   // bool invert;
