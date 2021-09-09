@@ -1,62 +1,73 @@
 #include "DistrhoPlugin.hpp"
 #include "DistrhoPluginInfo.h"
 #include "DistrhoUtils.hpp"
-#include "LFO.hpp"
-#include "RingBuffer.hpp"
-// ? set samplerate from the host ?
-#define SAMPLERATE 96000
-// #define BUFFER_SIZE SAMPLERATE * 0.025
+#include "faust/FaustDSP.hpp"
+#include <faust/dsp/dsp.h>
+#include <faust/gui/MapUI.h>
+
+const auto FREQ = "Frequency";
+const auto DEPTH = "Depth";
+const auto REGEN = "Regen";
+const auto DRY_WET = "Dry/Wet";
+const auto LEVEL = "Level";
 
 START_NAMESPACE_DISTRHO
 
 class AkoFlanger : public Plugin {
 public:
-  AkoFlanger()
-      : Plugin(paramParameterCount, 0, 0), delay((int) SAMPLERATE * 0.025),
-        ff_bufferR(delay), ff_bufferL(delay), fd_bufferR(delay),
-        fd_bufferL(delay), p1(delay * 0.6 - delay), p2(delay * 0.8 - delay),
-        p3(0), depth(0.5), regen(0.5), out_gain(0.8), lfo(5.0, SAMPLERATE) {}
+  AkoFlanger() : Plugin(paramParameterCount, 0, 0) {
+    fUI = new MapUI();
+    fDSP = new mydsp();
+    fDSP->buildUserInterface(fUI);
+    fDSP->init(this->getSampleRate());
+  }
 
 protected:
   const char *getLabel() const override { return "AkoFlanger"; }
   const char *getDescription() const override {
-    return "A simple experimental flanger plugin.";
+    return "A simple flanger plugin.";
   }
   const char *getMaker() const override { return "REIS0"; }
-  const char *getLicense() const override { return "GPL-3.0"; }
-  uint32_t getVersion() const override { return d_version(0, 0, 0); }
+  const char *getLicense() const override { return "GNU GPLv3"; }
+  uint32_t getVersion() const override { return d_version(0, 1, 0); }
   int64_t getUniqueId() const override { return d_cconst('A', 'k', 'o', 'F'); }
 
   void initParameter(uint32_t index, Parameter &parameter) override {
     switch (index) {
+    case paramFreq:
+      parameter.name = FREQ;
+      parameter.symbol = "freq";
+      parameter.ranges.def = 1.f;
+      parameter.ranges.min = 0.1f;
+      parameter.ranges.max = 2.f;
+      break;
     case paramDepth:
-      parameter.name = "Depth";
+      parameter.name = DEPTH;
       parameter.symbol = "depth";
-      parameter.ranges.def = 0.5;
-      parameter.ranges.min = 0.0;
-      parameter.ranges.max = 1.0;
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 0.9f;
       break;
-    case paramLFOSpeed:
-      parameter.name = "Speed";
-      parameter.symbol = "speed";
-      parameter.ranges.def = 5.0;
-      parameter.ranges.min = 1.0;
-      parameter.ranges.max = 10.0;
-      break;
-    case paramRegenAmount:
-      parameter.name = "Regen";
+    case paramRegen:
+      parameter.name = REGEN;
       parameter.symbol = "regen";
-      parameter.ranges.def = 0.5;
-      parameter.ranges.min = 0.0;
-      parameter.ranges.max = 1.0;
+      parameter.ranges.def = 0.25f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 0.5f;
       break;
-    case paramOutGain:
-      parameter.name = "Output Gain";
-      parameter.symbol = "out_gain";
-      parameter.ranges.def = 0.8;
-      parameter.ranges.min = 0.1;
-      parameter.ranges.max = 1.0;
-      parameter.hints = kParameterIsOutput;
+    case paramDryWet:
+      parameter.name = DRY_WET;
+      parameter.symbol = "dry_wet";
+      parameter.ranges.def = 0.5f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 1.f;
+      break;
+    case paramLevel:
+      parameter.name = LEVEL;
+      parameter.symbol = "level";
+      parameter.ranges.def = 1.f;
+      parameter.ranges.min = 0.f;
+      parameter.ranges.max = 1.f;
       break;
     default:
       return;
@@ -65,14 +76,16 @@ protected:
 
   float getParameterValue(uint32_t index) const override {
     switch (index) {
+    case paramFreq:
+      return fUI->getParamValue(FREQ);
     case paramDepth:
-      return depth;
-    case paramLFOSpeed:
-      return lfo.get_freq();
-    case paramRegenAmount:
-      return regen;
-    case paramOutGain:
-      return out_gain;
+      return fUI->getParamValue(DEPTH);
+    case paramRegen:
+      return fUI->getParamValue(REGEN);
+    case paramDryWet:
+      return fUI->getParamValue(DRY_WET);
+    case paramLevel:
+      return fUI->getParamValue(LEVEL);
     default:
       return 0.0;
     }
@@ -80,17 +93,20 @@ protected:
 
   void setParameterValue(uint32_t index, float value) override {
     switch (index) {
+    case paramFreq:
+      fUI->setParamValue(FREQ, value);
+      break;
     case paramDepth:
-      depth = value;
+      fUI->setParamValue(DEPTH, value);
       break;
-    case paramLFOSpeed:
-      lfo.set_freq(value);
+    case paramRegen:
+      fUI->setParamValue(REGEN, value);
       break;
-    case paramRegenAmount:
-      regen = value;
+    case paramDryWet:
+      fUI->setParamValue(DRY_WET, value);
       break;
-    case paramOutGain:
-      out_gain = value;
+    case paramLevel:
+      fUI->setParamValue(LEVEL, value);
       break;
     default:
       break;
@@ -98,74 +114,15 @@ protected:
   }
 
   void run(const float **inputs, float **outputs, uint32_t frames) override {
-    const float *const inL = inputs[0];
-    const float *const inR = inputs[1];
-    float *const outL = outputs[0];
-    float *const outR = outputs[1];
-    for (uint32_t i = 0; i < frames; ++i) {
-      float n = lfo.get_value();
-      v1L = n * (ff_bufferL.get_value(p1) - v1L) + ff_bufferL.get_value(p1 - 1);
-      v1R = n * (ff_bufferR.get_value(p1) - v1R) + ff_bufferR.get_value(p1 - 1);
-      v2L = n * (ff_bufferL.get_value(p2) - v2L) + ff_bufferL.get_value(p2 - 1);
-      v2R = n * (ff_bufferR.get_value(p2) - v2R) + ff_bufferR.get_value(p2 - 1);
-      v3L = n * (ff_bufferL.get_value(p3) - v3L) + ff_bufferL.get_value(p3 - 1);
-      v3R = n * (ff_bufferR.get_value(p3) - v3L) + ff_bufferR.get_value(p3 - 1);
-      // TODO: feedback modulation
-      outL[i] = inL[i] + (depth * 0.3) * v1L + (depth * 0.4) * v2L +
-                (depth * 0.5) * v3L - regen * fd_bufferL.get_value(p3);
-      outR[i] = inR[i] + (depth * 0.3) * v1R + (depth * 0.4) * v2R +
-                (depth * 0.5) * v3R - regen * fd_bufferL.get_value(p3);
-      ff_bufferL.set_value(p3, inL[i]);
-      ff_bufferR.set_value(p3, inR[i]);
-      fd_bufferL.set_value(p3, outL[i]);
-      fd_bufferR.set_value(p3, outR[i]);
-      outL[i] = outL[i] * out_gain;
-      outR[i] = outR[i] * out_gain;
-      p1++;
-      p2++;
-      p3++;
-      if (p1 >= delay) {
-        p1 = 0;
-      }
-      if (p2 >= delay) {
-        p2 = 0;
-      }
-      if (p3 >= delay) {
-        p3 = 0;
-      }
-    }
+    float *casted_inputs[] = {const_cast<float *>(inputs[0]),
+                              const_cast<float *>(inputs[1])};
+
+    fDSP->compute(frames, casted_inputs, outputs);
   }
 
 private:
-  int delay; // max delay
-
-  RingBuffer ff_bufferR; // feedforward buffer
-  RingBuffer ff_bufferL;
-  RingBuffer fd_bufferR; // feedback buffer
-  RingBuffer fd_bufferL;
-
-  // the pivots for each delay line
-  int p1, p2, p3;
-
-  // y(n - 1) from allpass interpolation
-  float v1L = 0;
-  float v1R = 0;
-  float v2L = 0;
-  float v2R = 0;
-  float v3L = 0;
-  float v3R = 0;
-
-  // PARAMS
-
-  float depth;
-  float regen;
-
-  float out_gain;
-
-  LFO lfo;
-
-  // TODO: invert depth operation
-  // bool invert;
+  MapUI *fUI;
+  dsp *fDSP;
 
   DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AkoFlanger);
 };

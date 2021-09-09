@@ -25,13 +25,11 @@
 #define DISTRHO_PLUGIN_NUM_OUTPUTS   2
 
 enum Parameters {
+    paramFreq,
     paramDepth,
-    paramLFOSpeed,
-    paramRegenAmount,
-    paramOutGain,
-    // TODO: wave type
-    // paramWaveType,
-    // kInvert,
+    paramRegen,
+    paramDryWet,
+    paramLevel,
     paramParameterCount
 };
 
