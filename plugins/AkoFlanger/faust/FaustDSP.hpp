@@ -3,8 +3,8 @@ author: "REIS0"
 license: "GNU GPLv3"
 name: "AkoFlanger"
 version: "0.1"
-Code generated with Faust 2.20.2 (https://faust.grame.fr)
-Compilation options: -lang cpp -scal -ftz 0
+Code generated with Faust 2.30.5 (https://faust.grame.fr)
+Compilation options: -lang cpp -es 1 -scal -ftz 0
 ------------------------------------------------------------ */
 
 #ifndef  __mydsp_H__
@@ -172,6 +172,7 @@ class mydsp : public dsp {
 		m->declare("author", "REIS0");
 		m->declare("basics.lib/name", "Faust Basic Element Library");
 		m->declare("basics.lib/version", "0.1");
+		m->declare("compile_options", "-lang cpp -es 1 -scal -ftz 0");
 		m->declare("delays.lib/name", "Faust Delay Library");
 		m->declare("delays.lib/version", "0.1");
 		m->declare("filename", "akoflanger.dsp");
@@ -180,10 +181,12 @@ class mydsp : public dsp {
 		m->declare("maths.lib/copyright", "GRAME");
 		m->declare("maths.lib/license", "LGPL with exception");
 		m->declare("maths.lib/name", "Faust Math Library");
-		m->declare("maths.lib/version", "2.1");
+		m->declare("maths.lib/version", "2.3");
 		m->declare("name", "AkoFlanger");
 		m->declare("oscillators.lib/name", "Faust Oscillator Library");
-		m->declare("oscillators.lib/version", "0.0");
+		m->declare("oscillators.lib/version", "0.1");
+		m->declare("platform.lib/name", "Generic Platform Library");
+		m->declare("platform.lib/version", "0.1");
 		m->declare("signals.lib/name", "Faust Signal Routing Library");
 		m->declare("signals.lib/version", "0.0");
 		m->declare("version", "0.1");
@@ -359,7 +362,9 @@ class mydsp : public dsp {
 
 /*******************BEGIN ARCHITECTURE SECTION (part 2/2)***************/
 
-/********************END ARCHITECTURE SECTION (part 2/2)****************/
+// Factory API
+dsp* createmydsp() { return new mydsp(); }
 
+/********************END ARCHITECTURE SECTION (part 2/2)****************/
 
 #endif
