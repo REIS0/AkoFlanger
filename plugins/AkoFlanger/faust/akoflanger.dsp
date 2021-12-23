@@ -11,7 +11,7 @@ max_delay = ma.SR * 0.005;
 min_delay = ma.SR * 0.002;
 
 freq = hslider("[0]Frequency", 1, 0.1, 2, 0.01) : si.smooth(0.999);
-lfo = os.osc(freq) * 0.5 + 0.5;
+lfo = (os.triangle(freq) * 0.5 + 0.45) + 0.04;
 ldelay = lfo * (max_delay - min_delay + min_delay);
 
 flanger(depth, regen) = (+ <: de.fdelay(max_delay, ldelay) * depth, _) ~ *(regen) : + : *(0.6);

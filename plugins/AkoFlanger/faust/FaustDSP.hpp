@@ -245,8 +245,8 @@ class mydsp : public dsp {
 	virtual void instanceConstants(int sample_rate) {
 		fSampleRate = sample_rate;
 		fConst0 = std::min<float>(192000.0f, std::max<float>(1.0f, float(fSampleRate)));
-		fConst1 = ((0.00499999989f * fConst0) + 1.0f);
-		fConst2 = (0.00249999994f * fConst0);
+		fConst1 = (0.00499999989f * fConst0);
+		fConst2 = (fConst1 + 1.0f);
 		fConst3 = (1.0f / fConst0);
 	}
 	
@@ -332,13 +332,13 @@ class mydsp : public dsp {
 			fRec4[0] = (fSlow5 + (0.999000013f * fRec4[1]));
 			float fTemp2 = (fRec3[1] + (fConst3 * fRec4[0]));
 			fRec3[0] = (fTemp2 - std::floor(fTemp2));
-			float fTemp3 = (fConst2 * (ftbl0mydspSIG0[int((65536.0f * fRec3[0]))] + 1.0f));
+			float fTemp3 = (fConst1 * ((0.5f * ftbl0mydspSIG0[int((65536.0f * fRec3[0]))]) + 0.479999989f));
 			int iTemp4 = int(fTemp3);
-			int iTemp5 = int(std::min<float>(fConst1, float(std::max<int>(0, iTemp4))));
+			int iTemp5 = int(std::min<float>(fConst2, float(std::max<int>(0, iTemp4))));
 			float fTemp6 = std::floor(fTemp3);
 			float fTemp7 = (fTemp6 + (1.0f - fTemp3));
 			float fTemp8 = (fTemp3 - fTemp6);
-			int iTemp9 = int(std::min<float>(fConst1, float(std::max<int>(0, (iTemp4 + 1)))));
+			int iTemp9 = int(std::min<float>(fConst2, float(std::max<int>(0, (iTemp4 + 1)))));
 			fRec0[0] = (fSlow3 * ((fVec0[((IOTA - iTemp5) & 1023)] * fTemp7) + (fTemp8 * fVec0[((IOTA - iTemp9) & 1023)])));
 			float fRec1 = fTemp1;
 			output0[i] = FAUSTFLOAT((fSlow0 * ((fSlow2 * (fRec0[0] + fRec1)) + (fSlow6 * fTemp0))));
