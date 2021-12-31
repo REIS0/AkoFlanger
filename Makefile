@@ -44,4 +44,9 @@ clean:
 
 # --------------------------------------------------------------
 
+# Extra stuff
+install:
+	cp -rv bin/AkoFlanger.lv2 ~/.lv2
+	cp -rv bin/AkoFlanger-vst.so ~/.vst
+
 .PHONY: plugins
