@@ -9,7 +9,6 @@ const auto FREQ = "Frequency";
 const auto DEPTH = "Depth";
 const auto REGEN = "Regen";
 const auto DRY_WET = "Dry/Wet";
-const auto LEVEL = "Level";
 
 START_NAMESPACE_DISTRHO
 
@@ -62,13 +61,6 @@ protected:
       parameter.ranges.min = 0.f;
       parameter.ranges.max = 1.f;
       break;
-    case paramLevel:
-      parameter.name = LEVEL;
-      parameter.symbol = "level";
-      parameter.ranges.def = 1.f;
-      parameter.ranges.min = 0.f;
-      parameter.ranges.max = 1.f;
-      break;
     default:
       return;
     }
@@ -84,8 +76,6 @@ protected:
       return fUI->getParamValue(REGEN);
     case paramDryWet:
       return fUI->getParamValue(DRY_WET);
-    case paramLevel:
-      return fUI->getParamValue(LEVEL);
     default:
       return 0.0;
     }
@@ -104,9 +94,6 @@ protected:
       break;
     case paramDryWet:
       fUI->setParamValue(DRY_WET, value);
-      break;
-    case paramLevel:
-      fUI->setParamValue(LEVEL, value);
       break;
     default:
       break;

@@ -29,7 +29,6 @@ enum Parameters {
     paramDepth,
     paramRegen,
     paramDryWet,
-    paramLevel,
     paramParameterCount
 };
 
