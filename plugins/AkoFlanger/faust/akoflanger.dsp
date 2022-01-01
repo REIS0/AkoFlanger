@@ -17,9 +17,9 @@ flanger(depth, regen) = (+ <: de.fdelay(max_delay, ldelay) * depth, _) ~ *(regen
 
 akoflanger = _ <: flanger(depth, regen), _ : *(dry_wet), *(1-dry_wet) : + : fi.lowpass(1, 22000)
 with{
-    depth = hslider("[1]Depth", 0.5, 0.1, 0.9, 0.01);
+    depth = hslider("[1]Depth", 0.5, 0.1, 0.9, 0.01) : si.smooth(0.999);
     regen = hslider("[2]Regen", 0.25, 0.0, 0.5, 0.01); 
-    dry_wet = hslider("[3]Dry/Wet", 0.5, 0, 1, 0.01);
+    dry_wet = hslider("[3]Dry/Wet", 0.5, 0, 1, 0.01) : si.smooth(0.999);
 };
 
 process = akoflanger, akoflanger;
