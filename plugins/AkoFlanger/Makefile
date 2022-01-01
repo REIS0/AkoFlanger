@@ -16,12 +16,12 @@ NAME = AkoFlanger
 # --------------------------------------------------------------
 # Files to build
 
-FILES_DSP = AkoFlanger.cpp RingBuffer.cpp LFO.cpp
+FILES_DSP = AkoFlanger.cpp 
 
 # --------------------------------------------------------------
 # Do some magic
 
-include ../../dpf/Makefile.plugins.mk
+include ../../dpf/Makefile.plugins.mk faust/Makefile
 
 # --------------------------------------------------------------
 # VST2 and LV2 targets
