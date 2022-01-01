@@ -160,7 +160,6 @@ class mydsp : public dsp {
 	float fVec0[1024];
 	float fConst4;
 	float fConst5;
-	float fConst6;
 	FAUSTFLOAT fHslider3;
 	float fRec5[2];
 	float fRec4[2];
@@ -264,12 +263,11 @@ class mydsp : public dsp {
 	virtual void instanceConstants(int sample_rate) {
 		fSampleRate = sample_rate;
 		fConst0 = std::min<float>(192000.0f, std::max<float>(1.0f, float(fSampleRate)));
-		fConst1 = (1.0f / std::tan((78539.8125f / fConst0)));
+		fConst1 = (1.0f / std::tan((69115.0391f / fConst0)));
 		fConst2 = (1.0f / (fConst1 + 1.0f));
 		fConst3 = (1.0f - fConst1);
-		fConst4 = (0.00499999989f * fConst0);
-		fConst5 = (fConst4 + 1.0f);
-		fConst6 = (1.0f / fConst0);
+		fConst4 = ((0.00499999989f * fConst0) + 1.0f);
+		fConst5 = (1.0f / fConst0);
 	}
 	
 	virtual void instanceResetUserInterface() {
@@ -360,15 +358,15 @@ class mydsp : public dsp {
 			float fTemp1 = (fTemp0 + (fSlow3 * fRec1[1]));
 			fVec0[(IOTA & 1023)] = fTemp1;
 			fRec5[0] = (fSlow4 + (0.999000013f * fRec5[1]));
-			float fTemp2 = (fRec4[1] + (fConst6 * fRec5[0]));
+			float fTemp2 = (fRec4[1] + (fConst5 * fRec5[0]));
 			fRec4[0] = (fTemp2 - std::floor(fTemp2));
-			float fTemp3 = (fConst4 * ((0.425000012f * ftbl0mydspSIG0[int((65536.0f * fRec4[0]))]) + 0.5f));
+			float fTemp3 = (fConst0 * ((0.00300000003f * ((0.425000012f * ftbl0mydspSIG0[int((65536.0f * fRec4[0]))]) + 0.5f)) + 0.00200000009f));
 			int iTemp4 = int(fTemp3);
-			int iTemp5 = int(std::min<float>(fConst5, float(std::max<int>(0, iTemp4))));
+			int iTemp5 = int(std::min<float>(fConst4, float(std::max<int>(0, iTemp4))));
 			float fTemp6 = std::floor(fTemp3);
 			float fTemp7 = (fTemp6 + (1.0f - fTemp3));
 			float fTemp8 = (fTemp3 - fTemp6);
-			int iTemp9 = int(std::min<float>(fConst5, float(std::max<int>(0, (iTemp4 + 1)))));
+			int iTemp9 = int(std::min<float>(fConst4, float(std::max<int>(0, (iTemp4 + 1)))));
 			fRec1[0] = (fSlow2 * ((fVec0[((IOTA - iTemp5) & 1023)] * fTemp7) + (fTemp8 * fVec0[((IOTA - iTemp9) & 1023)])));
 			float fRec2 = fTemp1;
 			float fTemp10 = ((fSlow1 * (fRec1[0] + fRec2)) + (fSlow5 * fTemp0));
